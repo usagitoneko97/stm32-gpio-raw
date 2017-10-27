@@ -96,11 +96,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   enableGpioG();
   enableGpioA();
-  gpioGConfig(redLedPin, GPIO_MODE_OUT, 			\
+  gpioConfig(GpioG, redLedPin, GPIO_MODE_OUT, 			\
 		  	  	  GPIO_PUSH_PULL, GPIO_NOPULL, GPIO_H_SPEED);
-  gpioGConfig(greenLedPin, GPIO_MODE_OUT, 		\
+  gpioConfig(GpioG, greenLedPin, GPIO_MODE_OUT, 		\
   		  	  	  GPIO_PUSH_PULL, GPIO_NOPULL, GPIO_L_SPEED);
-  gpioGConfig(userButtonPin, GPIO_MODE_IN, GPIO_PUSH_PULL, GPIO_NOPULL, GPIO_L_SPEED);
+  //gpioAConfig(userButtonPin, GPIO_MODE_IN, GPIO_PUSH_PULL, GPIO_NOPULL, GPIO_L_SPEED);
 
 
 
@@ -113,21 +113,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  /*gpioGWrite(redLedPin, 0);
-	  gpioGWrite(greenLedPin, 1);
-	  HAL_Delay(200);
+	  gpioGWrite(redLedPin, 0);
+//	  gpioGWrite(greenLedPin, 1);
+	  HAL_Delay(100);
 	  gpioGWrite(redLedPin, 1);
-	  gpioGWrite(greenLedPin, 0);
-	  HAL_Delay(200);*/
+//	  gpioGWrite(greenLedPin, 0);
+	  		  //HAL_Delay(200);
+	  if(gpioRead(GpioA, userButtonPin) == 1){
+		  gpioToggle(GpioG, greenLedPin);
+		  HAL_Delay(100);
 
-	  if(gpioARead(userButtonPin) == 1){
-		  gpioGWrite(redLedPin, 0);
-		  gpioGWrite(greenLedPin, 1);
-		  HAL_Delay(200);
-		  gpioGWrite(redLedPin, 1);
-		  gpioGWrite(greenLedPin, 0);
-		  HAL_Delay(200);
 	  }
+	  HAL_Delay(100);
 
   /* USER CODE END WHILE */
 

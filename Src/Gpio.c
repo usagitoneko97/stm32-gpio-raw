@@ -8,41 +8,83 @@
 
 #include"Gpio.h"
 
-uint32_t *gpioGMode = (uint32_t*)(GPIOG_BASE_ADDR+GPIO_MODE_OFF);
-uint32_t *gpioOSpeed= (uint32_t*)(GPIOG_BASE_ADDR+GPIO_OSPEED_OFF);
-uint32_t *gpioGPupd= (uint32_t*)(GPIOG_BASE_ADDR+GPIO_PUPD_OFF);
-uint32_t *gpioGOtype = (uint32_t*)(GPIOG_BASE_ADDR + GPIO_OTYPE_OFF);
-uint32_t *gpioGOdr= (uint32_t*)(GPIOG_BASE_ADDR + GPIO_ODR_OFF);
-uint32_t *gpioAIdr = (uint32_t*)(GPIOA_BASE_ADDR + GPIO_IDR_OFF);
 
 
 void gpioGConfig(int pin, int mode, int outDriveType, int pullType, int speed){
 	/*clear pin mode to 0*/
-	*gpioGMode &= ~(3<<(pin*2));
+	GpioG->mode &= ~(3<<(pin*2));
 	/*set the mode*/
-	*gpioGMode |= (mode<<(pin*2));
+	GpioG->mode |= (mode<<(pin*2));
 	//*gpioGMode = 0xff;
 
-	*gpioOSpeed   &= ~(3<<(pin*2)); //clear the pin speed
-	*gpioOSpeed   |= speed<<(pin*2); //set the pin speed
+	GpioG->outSpeed   &= ~(3<<(pin*2)); //clear the pin speed
+	GpioG->outSpeed  |= speed<<(pin*2); //set the pin speed
 
-	*gpioGPupd = ~(pullType<<(pin*2)); //set the pupd
+	GpioG->pullType = ~(pullType<<(pin*2)); //set the pupd
 
-	*gpioGOtype |= (outDriveType<<pin);
+	GpioG->outType |= (outDriveType<<pin);
+
+}
+
+void gpioConfig(GpioReg *gpio, int pin, int mode, int outDriveType, int pullType, int speed){
+	/*clear pin mode to 0*/
+	gpio->mode &= ~(3<<(pin*2));
+	/*set the mode*/
+	gpio->mode |= (mode<<(pin*2));
+	//*gpioGMode = 0xff;
+
+	gpio->outSpeed   &= ~(3<<(pin*2)); //clear the pin speed
+	gpio->outSpeed  |= speed<<(pin*2); //set the pin speed
+
+	gpio->pullType = ~(pullType<<(pin*2)); //set the pupd
+
+	gpio->outType |= (outDriveType<<pin);
+
+}
+
+void gpioAConfig(int pin, int mode, int outDriveType, int pullType, int speed){
+	/*clear pin mode to 0*/
+	GpioA->mode &= ~(3<<(pin*2));
+	/*set the mode*/
+	GpioA->mode |= (mode<<(pin*2));
+	//*gpioGMode = 0xff;
+
+	GpioA->outSpeed   &= ~(3<<(pin*2)); //clear the pin speed
+	GpioA->outSpeed  |= speed<<(pin*2); //set the pin speed
+
+	GpioA->pullType = ~(pullType<<(pin*2)); //set the pupd
+
+	GpioA->outType |= (outDriveType<<pin);
 
 }
 
 void gpioGWrite(int pin, int state){
 	if(state == 1){
-		*gpioGOdr |= 1<<pin;
+		GpioG->outData |= 1<<pin;
 
 	}
 	else{
-		*gpioGOdr &= ~(1<<pin);
+		GpioG->outData &= ~(1<<pin);
 	}
 }
 
-int gpioARead(int pin){
-	return (((*gpioAIdr)&0x1) > 0);
+void gpioWrite(GpioReg *gpio, int pin, int state){
+	if(state == 1){
+		gpio->outData |= 1<<pin;
+
+	}
+	else{
+		gpio->outData &= ~(1<<pin);
+	}
 }
 
+
+int gpioARead(int pin){
+	return (((GpioA->inData)&0x1) > 0);
+}
+int gpioRead(GpioReg *gpio, int pin){
+	return (((gpio->inData)&(0x1<<pin)) > 0);
+}
+void gpioToggle(GpioReg *gpio, int pin){
+	gpio->outData ^= (1<<pin);
+}
